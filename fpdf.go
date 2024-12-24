@@ -202,7 +202,6 @@ func fpdfNew(orientationStr, unitStr, sizeStr, fontDirStr string, size SizeType)
 	f.gradientList = append(f.gradientList, gradientType{}) // gradientList[0] is unused
 	// Set default PDF version number
 	f.pdfVersion = "1.3"
-	f.SetProducer("FPDF "+cnFpdfVersion, true)
 	f.layerInit()
 	f.catalogSort = gl.catalogSort
 	f.creationDate = gl.creationDate
@@ -746,7 +745,6 @@ func (f *Fpdf) AddPageFormat(orientationStr string, size SizeType) {
 		// Page footer avoid double call on footer.
 		if f.footerFnc != nil {
 			f.footerFnc()
-
 		} else if f.footerFncLpi != nil {
 			f.footerFncLpi(false) // not last page.
 		}
@@ -1062,7 +1060,6 @@ func (f *Fpdf) SetDashPattern(dashArray []float64, dashPhase float64) {
 	if f.page > 0 {
 		f.outputDashPattern()
 	}
-
 }
 
 func (f *Fpdf) outputDashPattern() {
@@ -1220,7 +1217,6 @@ func (f *Fpdf) Polygon(points []PointType, styleStr string) {
 // the current draw color and line width centered on the ellipse's perimeter.
 // Filling uses the current fill color.
 func (f *Fpdf) Beziergon(points []PointType, styleStr string) {
-
 	// Thanks, Robert Lillack, for contributing this function.
 
 	if len(points) < 4 {
@@ -1390,8 +1386,10 @@ func (f *Fpdf) gradient(tp, r1, g1, b1, r2, g2, b2 int, x1, y1, x2, y2, r float6
 	pos := len(f.gradientList)
 	clr1 := rgbColorValue(r1, g1, b1, "", "")
 	clr2 := rgbColorValue(r2, g2, b2, "", "")
-	f.gradientList = append(f.gradientList, gradientType{tp, clr1.str, clr2.str,
-		x1, y1, x2, y2, r, 0})
+	f.gradientList = append(f.gradientList, gradientType{
+		tp, clr1.str, clr2.str,
+		x1, y1, x2, y2, r, 0,
+	})
 	f.outf("/Sh%d sh", pos)
 }
 
@@ -1876,7 +1874,6 @@ func (f *Fpdf) addFontFromBytes(familyStr, styleStr string, jsonFileBytes, zFile
 		// load font definitions
 		var info fontDefType
 		err := json.Unmarshal(jsonFileBytes, &info)
-
 		if err != nil {
 			f.err = err
 		}
@@ -2198,7 +2195,10 @@ func (f *Fpdf) Bookmark(txtStr string, level int, y float64) {
 	if f.isCurrentUTF8 {
 		txtStr = utf8toutf16(txtStr)
 	}
-	f.outlines = append(f.outlines, outlineType{text: txtStr, level: level, y: y, p: f.PageNo(), prev: -1, last: -1, next: -1, first: -1})
+	f.outlines = append(
+		f.outlines,
+		outlineType{text: txtStr, level: level, y: y, p: f.PageNo(), prev: -1, last: -1, next: -1, first: -1},
+	)
 }
 
 // Text prints a character string. The origin (x, y) is on the left of the
@@ -2310,7 +2310,8 @@ func (f *Fpdf) SetAcceptPageBreakFunc(fnc func() bool) {
 // linkStr is a target URL or empty for no external link. A non--zero value for
 // link takes precedence over linkStr.
 func (f *Fpdf) CellFormat(w, h float64, txtStr, borderStr string, ln int,
-	alignStr string, fill bool, link int, linkStr string) {
+	alignStr string, fill bool, link int, linkStr string,
+) {
 	// dbg("CellFormat. h = %.2f, borderStr = %s", h, borderStr)
 	if f.err != nil {
 		return
@@ -2360,7 +2361,7 @@ func (f *Fpdf) CellFormat(w, h float64, txtStr, borderStr string, ln int,
 			// dbg("border is '1', no fill")
 			op = "S"
 		}
-		/// dbg("(CellFormat) f.x %.2f f.k %.2f", f.x, f.k)
+		// / dbg("(CellFormat) f.x %.2f f.k %.2f", f.x, f.k)
 		s.printf("%.2f %.2f %.2f %.2f re %s ", f.x*k, (f.h-f.y)*k, w*k, -h*k, op)
 	}
 	if len(borderStr) > 0 && borderStr != "1" {
@@ -2418,7 +2419,7 @@ func (f *Fpdf) CellFormat(w, h float64, txtStr, borderStr string, ln int,
 		if f.colorFlag {
 			s.printf("q %s ", f.color.text.str)
 		}
-		//If multibyte, Tw has no effect - do word spacing using an adjustment before each space
+		// If multibyte, Tw has no effect - do word spacing using an adjustment before each space
 		if (f.ws != 0 || alignStr == "J") && f.isCurrentUTF8 { // && f.ws != 0
 			if f.isRTL {
 				txtStr = reverseText(txtStr)
@@ -2461,7 +2462,7 @@ func (f *Fpdf) CellFormat(w, h float64, txtStr, borderStr string, ln int,
 			bt := (f.x + dx) * k
 			td := (f.h - (f.y + dy + .5*h + .3*f.fontSize)) * k
 			s.printf("BT %.2f %.2f Td (%s)Tj ET", bt, td, txt2)
-			//BT %.2F %.2F Td (%s) Tj ET',(f.x+dx)*k,(f.h-(f.y+.5*h+.3*f.FontSize))*k,txt2);
+			// BT %.2F %.2F Td (%s) Tj ET',(f.x+dx)*k,(f.h-(f.y+.5*h+.3*f.FontSize))*k,txt2);
 		}
 
 		if f.underline {
@@ -2713,9 +2714,9 @@ func (f *Fpdf) MultiCell(w, h float64, txtStr, borderStr, alignStr string, fill 
 			f.err = fmt.Errorf("character outside the supported range: %s", string(c))
 			return
 		}
-		if cw[int(c)] == 0 { //Marker width 0 used for missing symbols
+		if cw[int(c)] == 0 { // Marker width 0 used for missing symbols
 			l += f.currentFont.Desc.MissingWidth
-		} else if cw[int(c)] != 65535 { //Marker width 65535 used for zero width symbols
+		} else if cw[int(c)] != 65535 { // Marker width 65535 used for zero width symbols
 			l += cw[int(c)]
 		}
 		if l > wmax {
@@ -2925,7 +2926,7 @@ func (f *Fpdf) WriteLinkID(h float64, displayStr string, linkID int) {
 //
 // width indicates the width of the box the text will be drawn in. This is in
 // the unit of measure specified in New(). If it is set to 0, the bounding box
-//of the page will be taken (pageWidth - leftMargin - rightMargin).
+// of the page will be taken (pageWidth - leftMargin - rightMargin).
 //
 // lineHeight indicates the line height in the unit of measure specified in
 // New().
@@ -3109,7 +3110,14 @@ func (f *Fpdf) Image(imageNameStr string, x, y, w, h float64, flow bool, tp stri
 // If link refers to an internal page anchor (that is, it is non-zero; see
 // AddLink()), the image will be a clickable internal link. Otherwise, if
 // linkStr specifies a URL, the image will be a clickable external link.
-func (f *Fpdf) ImageOptions(imageNameStr string, x, y, w, h float64, flow bool, options ImageOptions, link int, linkStr string) {
+func (f *Fpdf) ImageOptions(
+	imageNameStr string,
+	x, y, w, h float64,
+	flow bool,
+	options ImageOptions,
+	link int,
+	linkStr string,
+) {
 	if f.err != nil {
 		return
 	}
@@ -3325,7 +3333,14 @@ func (f *Fpdf) putImportedTemplates() {
 // UseImportedTemplate uses imported template from gofpdi. It draws imported
 // PDF page onto page.
 func (f *Fpdf) UseImportedTemplate(tplName string, scaleX float64, scaleY float64, tX float64, tY float64) {
-	f.outf("q 0 J 1 w 0 j 0 G 0 g q %.4F 0 0 %.4F %.4F %.4F cm %s Do Q Q\n", scaleX*f.k, scaleY*f.k, tX*f.k, (tY+f.h)*f.k, tplName)
+	f.outf(
+		"q 0 J 1 w 0 j 0 G 0 g q %.4F 0 0 %.4F %.4F %.4F cm %s Do Q Q\n",
+		scaleX*f.k,
+		scaleY*f.k,
+		tX*f.k,
+		(tY+f.h)*f.k,
+		tplName,
+	)
 }
 
 // ImportTemplates imports gofpdi template names into importedTplObjs for
@@ -4115,7 +4130,14 @@ func (f *Fpdf) putfonts() {
 				delete(CodeSignDictionary, 0)
 
 				f.newobj()
-				f.out(fmt.Sprintf("<</Type /Font\n/Subtype /Type0\n/BaseFont /%s\n/Encoding /Identity-H\n/DescendantFonts [%d 0 R]\n/ToUnicode %d 0 R>>\n"+"endobj", fontName, f.n+1, f.n+2))
+				f.out(
+					fmt.Sprintf(
+						"<</Type /Font\n/Subtype /Type0\n/BaseFont /%s\n/Encoding /Identity-H\n/DescendantFonts [%d 0 R]\n/ToUnicode %d 0 R>>\n"+"endobj",
+						fontName,
+						f.n+1,
+						f.n+2,
+					),
+				)
 
 				f.newobj()
 				f.out("<</Type /Font\n/Subtype /CIDFontType2\n/BaseFont /" + fontName + "\n" +
@@ -4171,7 +4193,7 @@ func (f *Fpdf) putfonts() {
 				f.putstream(cidToGidMap)
 				f.out("endobj")
 
-				//Font file
+				// Font file
 				f.newobj()
 				f.out("<</Length " + strconv.Itoa(len(compressedFontStream)))
 				f.out("/Filter /FlateDecode")
@@ -4930,7 +4952,8 @@ func (f *Fpdf) ArcTo(x, y, rx, ry, degRotate, degStart, degEnd float64) {
 }
 
 func (f *Fpdf) arc(x, y, rx, ry, degRotate, degStart, degEnd float64,
-	styleStr string, path bool) {
+	styleStr string, path bool,
+) {
 	x *= f.k
 	y = (f.h - y) * f.k
 	rx *= f.k
