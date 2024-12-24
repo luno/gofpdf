@@ -22,4 +22,8 @@ doc/index.html.ok
 coverage.html
 
 # macOS
-.DS_Store
+.DS_Store!
+
+# Go
+/go.work
+/go.work.sum
