@@ -161,7 +161,13 @@ func (f *Fpdf) putTemplates() {
 		f.outf("<<%s/Type /XObject", filter)
 		f.out("/Subtype /Form")
 		f.out("/Formtype 1")
-		f.outf("/BBox [%.2f %.2f %.2f %.2f]", corner.X*f.k, corner.Y*f.k, (corner.X+size.Wd)*f.k, (corner.Y+size.Ht)*f.k)
+		f.outf(
+			"/BBox [%.2f %.2f %.2f %.2f]",
+			corner.X*f.k,
+			corner.Y*f.k,
+			(corner.X+size.Wd)*f.k,
+			(corner.Y+size.Ht)*f.k,
+		)
 		if corner.X != 0 || corner.Y != 0 {
 			f.outf("/Matrix [1 0 0 1 %.5f %.5f]", -corner.X*f.k*2, corner.Y*f.k*2)
 		}
@@ -266,7 +272,7 @@ chain:
 	return sorted
 }
 
-//  templateChainDependencies is a recursive function for determining the full chain of template dependencies
+// templateChainDependencies is a recursive function for determining the full chain of template dependencies
 func templateChainDependencies(template Template) []Template {
 	requires := template.Templates()
 	chain := make([]Template, len(requires)*2)

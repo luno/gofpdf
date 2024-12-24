@@ -418,7 +418,6 @@ func (g GridType) Grid(pdf *Fpdf) {
 		st.Put(pdf)
 
 	}
-
 }
 
 // Plot plots a series of count line segments from xMin to xMax. It repeatedly

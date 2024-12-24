@@ -100,7 +100,6 @@ func (f *Fpdf) layerPutResourceDict() {
 		}
 		f.out(">>")
 	}
-
 }
 
 func (f *Fpdf) layerPutCatalog() {
