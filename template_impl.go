@@ -26,7 +26,13 @@ import (
  */
 
 // newTpl creates a template, copying graphics settings from a template if one is given
-func newTpl(corner PointType, size SizeType, orientationStr, unitStr, fontDirStr string, fn func(*Tpl), copyFrom *Fpdf) Template {
+func newTpl(
+	corner PointType,
+	size SizeType,
+	orientationStr, unitStr, fontDirStr string,
+	fn func(*Tpl),
+	copyFrom *Fpdf,
+) Template {
 	sizeStr := ""
 
 	fpdf := fpdfNew(orientationStr, unitStr, sizeStr, fontDirStr, size)
