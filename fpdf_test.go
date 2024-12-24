@@ -32,9 +32,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/phpdave11/gofpdf"
-	"github.com/phpdave11/gofpdf/internal/example"
-	"github.com/phpdave11/gofpdf/internal/files"
+	"github.com/luno/gofpdf"
+	"github.com/luno/gofpdf/internal/example"
+	"github.com/luno/gofpdf/internal/files"
 )
 
 func init() {
@@ -141,7 +141,6 @@ func TestIssue0193(t *testing.T) {
 	if err != nil {
 		t.Fatalf("issue 193 error: %s", err)
 	}
-
 }
 
 // TestIssue0209SplitLinesEqualMultiCell addresses issue 209
@@ -246,8 +245,7 @@ func TestFooterFuncLpi(t *testing.T) {
 	}
 }
 
-type fontResourceType struct {
-}
+type fontResourceType struct{}
 
 func (f fontResourceType) Open(name string) (rdr io.Reader, err error) {
 	var buf []byte
@@ -1066,9 +1064,11 @@ func ExampleFpdf_SetAlpha() {
 		pageW = 210
 		pageH = 297
 	)
-	modeList := []string{"Normal", "Multiply", "Screen", "Overlay",
+	modeList := []string{
+		"Normal", "Multiply", "Screen", "Overlay",
 		"Darken", "Lighten", "ColorDodge", "ColorBurn", "HardLight", "SoftLight",
-		"Difference", "Exclusion", "Hue", "Saturation", "Color", "Luminosity"}
+		"Difference", "Exclusion", "Hue", "Saturation", "Color", "Luminosity",
+	}
 	pdf := gofpdf.New("", "", "", "")
 	pdf.SetLineWidth(2)
 	pdf.SetAutoPageBreak(false, 0)
@@ -1177,8 +1177,11 @@ func ExampleFpdf_ClipText() {
 		0.7, 0.3, 0.7, 0.5)
 	pdf.ClipEnd()
 
-	pdf.ClipPolygon([]gofpdf.PointType{{X: 80, Y: y + 20}, {X: 90, Y: y},
-		{X: 100, Y: y + 20}}, true)
+	pdf.ClipPolygon([]gofpdf.PointType{
+		{X: 80, Y: y + 20},
+		{X: 90, Y: y},
+		{X: 100, Y: y + 20},
+	}, true)
 	pdf.LinearGradient(80, y, 20, 20, 250, 220, 250, 60, 40, 60, 0.5,
 		1, 0.5, 0.5)
 	pdf.ClipEnd()
@@ -1556,7 +1559,7 @@ func ExampleFpdf_CellFormat_align() {
 		{"AC", "baseline center"},
 		{"AR", "baseline right"},
 	}
-	var formatRect = func(pdf *gofpdf.Fpdf, recList []recType) {
+	formatRect := func(pdf *gofpdf.Fpdf, recList []recType) {
 		linkStr := ""
 		for pageJ := 0; pageJ < 2; pageJ++ {
 			pdf.AddPage()
@@ -1568,7 +1571,7 @@ func ExampleFpdf_CellFormat_align() {
 				pdf.CellFormat(170, 257, rec.txt, borderStr, 0, rec.align, false, 0, linkStr)
 				borderStr = ""
 			}
-			linkStr = "https://github.com/phpdave11/gofpdf"
+			linkStr = "https://github.com/luno/gofpdf"
 		}
 	}
 	pdf := gofpdf.New("P", "mm", "A4", "") // A4 210.0 x 297.0
@@ -1694,7 +1697,8 @@ func ExampleFpdf_Polygon() {
 			pt.Y, pt.X = math.Sincos(float64(j) * mlt)
 			res = append(res, gofpdf.PointType{
 				X: x + radius*pt.X,
-				Y: y + radius*pt.Y})
+				Y: y + radius*pt.Y,
+			})
 		}
 		return
 	}
@@ -1732,7 +1736,6 @@ func ExampleFpdf_Polygon() {
 // displayed by the document reader allows layer visibility to be controlled
 // interactively.
 func ExampleFpdf_AddLayer() {
-
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 	pdf.SetFont("Arial", "", 15)
@@ -1770,13 +1773,12 @@ func ExampleFpdf_AddLayer() {
 // ExampleFpdf_RegisterImageReader demonstrates the use of an image that is retrieved from a web
 // server.
 func ExampleFpdf_RegisterImageReader() {
-
 	const (
 		margin   = 10
 		wd       = 210
 		ht       = 297
 		fontSize = 15
-		urlStr   = "https://github.com/phpdave11/gofpdf/blob/master/image/gofpdf.png?raw=true"
+		urlStr   = "https://github.com/luno/gofpdf/blob/main/image/gofpdf.png?raw=true"
 		msgStr   = `Images from the web can be easily embedded when a PDF document is generated.`
 	)
 
@@ -1808,12 +1810,10 @@ func ExampleFpdf_RegisterImageReader() {
 	example.Summary(err, fileStr)
 	// Output:
 	// Successfully generated pdf/Fpdf_RegisterImageReader_url.pdf
-
 }
 
 // ExampleFpdf_Beziergon demonstrates the Beziergon function.
 func ExampleFpdf_Beziergon() {
-
 	const (
 		margin      = 10
 		wd          = 210
@@ -1897,7 +1897,6 @@ func ExampleFpdf_Beziergon() {
 	example.Summary(err, fileStr)
 	// Output:
 	// Successfully generated pdf/Fpdf_Beziergon.pdf
-
 }
 
 // ExampleFpdf_SetFontLoader demonstrates loading a non-standard font using a generalized
@@ -1946,7 +1945,7 @@ func ExampleFpdf_SetLineJoinStyle() {
 	const offset = 75.0
 	pdf := gofpdf.New("L", "mm", "A4", "")
 	pdf.AddPage()
-	var draw = func(cap, join string, x0, y0, x1, y1 float64) {
+	draw := func(cap, join string, x0, y0, x1, y1 float64) {
 		// transform begin & end needed to isolate caps and joins
 		pdf.SetLineCapStyle(cap)
 		pdf.SetLineJoinStyle(join)
@@ -1966,7 +1965,6 @@ func ExampleFpdf_SetLineJoinStyle() {
 		pdf.LineTo((x0+x1)/2+offset, (y0+y1)/2)
 		pdf.LineTo(x1, y1)
 		pdf.DrawPath("D")
-
 	}
 	x := 35.0
 	caps := []string{"butt", "square", "round"}
@@ -2375,7 +2373,6 @@ func ExampleNewGrid() {
 func ExampleFpdf_SetPageBox() {
 	// pdfinfo (from http://www.xpdfreader.com) reports the following for this example:
 	// ~ pdfinfo -box pdf/Fpdf_PageBox.pdf
-	// Producer:       FPDF 1.7
 	// CreationDate:   Sat Jan  1 00:00:00 2000
 	// ModDate:   	   Sat Jan  1 00:00:00 2000
 	// Tagged:         no
@@ -2415,7 +2412,6 @@ func ExampleFpdf_SetPageBox() {
 // ExampleFpdf_SubWrite demonstrates subscripted and superscripted text
 // Adapted from http://www.fpdf.org/en/script/script61.php
 func ExampleFpdf_SubWrite() {
-
 	const (
 		fontSize = 12
 		halfX    = 105
@@ -2488,18 +2484,18 @@ func ExampleFpdf_SetPage() {
 	var pageNums []int
 	xMax := time[len(time)-1]
 	for i := range temperaturesFromSensors {
-		//Create a new page and graph for each sensor we want to graph.
+		// Create a new page and graph for each sensor we want to graph.
 		pdf.AddPage()
 		pdf.Ln(1)
-		//Custom label per sensor
+		// Custom label per sensor
 		pdf.WriteAligned(0, 0, "Temperature Sensor "+strconv.Itoa(i+1)+" (C) vs Time (min)", "C")
 		pdf.Ln(0.5)
 		graph := gofpdf.NewGrid(pdf.GetX(), pdf.GetY(), 20, 10)
 		graph.TickmarksContainX(0, xMax)
-		//Custom Y axis
+		// Custom Y axis
 		graph.TickmarksContainY(0, maxs[i])
 		graph.Grid(pdf)
-		//Save references and locations.
+		// Save references and locations.
 		graphs = append(graphs, graph)
 		pageNums = append(pageNums, pdf.PageNo())
 	}
@@ -2558,7 +2554,6 @@ func ExampleFpdf_SetFillColor() {
 // ExampleFpdf_TransformRotate demonstrates how to rotate text within a header
 // to make a watermark that appears on each page.
 func ExampleFpdf_TransformRotate() {
-
 	loremStr := lorem() + "\n\n"
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	margin := 25.0
@@ -2763,7 +2758,6 @@ func ExampleFpdf_SetUnderlineThickness() {
 
 // ExampleFpdf_Cell_strikeout demonstrates striked-out text
 func ExampleFpdf_Cell_strikeout() {
-
 	pdf := gofpdf.New("P", "mm", "A4", "") // 210mm x 297mm
 	pdf.AddPage()
 
@@ -2782,7 +2776,6 @@ func ExampleFpdf_Cell_strikeout() {
 
 // ExampleFpdf_SetTextRenderingMode demonstrates rendering modes in PDFs.
 func ExampleFpdf_SetTextRenderingMode() {
-
 	pdf := gofpdf.New("P", "mm", "A4", "") // 210mm x 297mm
 	pdf.AddPage()
 	fontSz := float64(16)
@@ -2910,12 +2903,11 @@ func ExampleFpdf_AddAttachmentAnnotation() {
 func ExampleFpdf_SetModificationDate() {
 	// pdfinfo (from http://www.xpdfreader.com) reports the following for this example :
 	// ~ pdfinfo -box pdf/Fpdf_PageBox.pdf
-	// Producer:       FPDF 1.7
 	// CreationDate:   Sat Jan  1 00:00:00 2000
 	// ModDate:        Sun Jan  2 10:22:30 2000
 	pdf := gofpdf.New("", "", "", "")
 	pdf.AddPage()
-	pdf.SetModificationDate(time.Date(2000, 1, 2, 10, 22, 30, 0, time.UTC))
+	pdf.SetModificationDate(time.Date(2010, 1, 2, 10, 22, 30, 0, time.UTC))
 	fileStr := example.Filename("Fpdf_SetModificationDate")
 	err := pdf.OutputFileAndClose(fileStr)
 	example.Summary(err, fileStr)

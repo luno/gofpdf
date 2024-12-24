@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/phpdave11/gofpdf"
 	"os"
+
+	"github.com/luno/gofpdf"
 )
 
 func errPrintf(fmtStr string, args ...interface{}) {
@@ -22,7 +23,10 @@ func showHelp() {
 		"determined from the file extension alone. If a Type1 file is specified, a\n"+
 		"metric file with the same pathname except with the extension .afm must be\n"+
 		"present.")
-	errPrintf("\nExample: %s --embed --enc=../font/cp1252.map --dst=../font calligra.ttf /opt/font/symbol.pfb\n", os.Args[0])
+	errPrintf(
+		"\nExample: %s --embed --enc=../font/cp1252.map --dst=../font calligra.ttf /opt/font/symbol.pfb\n",
+		os.Args[0],
+	)
 }
 
 func tutorialSummary(f *gofpdf.Fpdf, fileStr string) {

@@ -34,8 +34,9 @@ import (
 	"github.com/boombuler/barcode/ean"
 	"github.com/boombuler/barcode/qr"
 	"github.com/boombuler/barcode/twooffive"
-	"github.com/phpdave11/gofpdf"
-	"github.com/ruudk/golang-pdf417"
+	pdf417 "github.com/ruudk/golang-pdf417"
+
+	"github.com/luno/gofpdf"
 )
 
 // barcodes represents the barcodes that have been registered through this
@@ -80,7 +81,6 @@ func printBarcode(pdf barcodePdf, code string, x, y float64, w, h *float64, flow
 			scaleToWidth,
 			scaleToHeight,
 		)
-
 		if err != nil {
 			pdf.SetError(err)
 			return
@@ -104,7 +104,6 @@ func printBarcode(pdf barcodePdf, code string, x, y float64, w, h *float64, flow
 	}
 
 	pdf.Image(bname, x, y, scaleToWidthF, scaleToHeightF, flow, "jpg", 0, "")
-
 }
 
 // BarcodeUnscalable puts a registered barcode in the current page.
@@ -273,7 +272,6 @@ func barcodeKey(bcode barcode.Barcode) string {
 func registerScaledBarcode(pdf barcodePdf, code string, bcode barcode.Barcode) error {
 	buf := new(bytes.Buffer)
 	err := jpeg.Encode(buf, bcode, nil)
-
 	if err != nil {
 		return err
 	}

@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/phpdave11/gofpdf"
+	"github.com/luno/gofpdf"
 )
 
 // httpimgPdf is a partial interface that only implements the functions we need
@@ -27,7 +27,6 @@ func Register(f httpimgPdf, urlStr, tp string) (info *gofpdf.ImageInfoType) {
 	}
 
 	resp, err := http.Get(urlStr)
-
 	if err != nil {
 		f.SetError(err)
 		return
