@@ -82,7 +82,12 @@ func loadMap(encodingFileStr string) (encList encListType, err error) {
 }
 
 // getInfoFromTrueType returns information from a TrueType font
-func getInfoFromTrueType(fileStr string, msgWriter io.Writer, embed bool, encList encListType) (info fontInfoType, err error) {
+func getInfoFromTrueType(
+	fileStr string,
+	msgWriter io.Writer,
+	embed bool,
+	encList encListType,
+) (info fontInfoType, err error) {
 	info.Widths = make([]int, 256)
 	var ttf TtfType
 	ttf, err = TtfParse(fileStr)
@@ -168,7 +173,12 @@ func segmentRead(r io.Reader) (s segmentType, err error) {
 // -rw-r--r-- 1 root root 37744 2010-04-22 11:27 /usr/share/fonts/type1/mathml/Symbol.pfb
 
 // getInfoFromType1 return information from a Type1 font
-func getInfoFromType1(fileStr string, msgWriter io.Writer, embed bool, encList encListType) (info fontInfoType, err error) {
+func getInfoFromType1(
+	fileStr string,
+	msgWriter io.Writer,
+	embed bool,
+	encList encListType,
+) (info fontInfoType, err error) {
 	info.Widths = make([]int, 256)
 	if embed {
 		var f *os.File
@@ -333,7 +343,12 @@ func makeFontEncoding(encList encListType, refEncFileStr string) (diffStr string
 	return
 }
 
-func makeDefinitionFile(fileStr, tpStr, encodingFileStr string, embed bool, encList encListType, info fontInfoType) error {
+func makeDefinitionFile(
+	fileStr, tpStr, encodingFileStr string,
+	embed bool,
+	encList encListType,
+	info fontInfoType,
+) error {
 	var err error
 	var def fontDefType
 	def.Tp = tpStr
