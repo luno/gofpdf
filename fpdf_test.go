@@ -2641,11 +2641,11 @@ func ExampleUTF8CutFont() {
 
 	pdfFileStr = example.Filename("Fpdf_UTF8CutFont")
 	fullFontFileStr = example.FontFile("calligra.ttf")
-	fullFont, err = ioutil.ReadFile(fullFontFileStr)
+	fullFont, err = os.ReadFile(fullFontFileStr)
 	if err == nil {
 		subFontFileStr = "calligra_abcde.ttf"
 		subFont = gofpdf.UTF8CutFont(fullFont, "abcde")
-		err = ioutil.WriteFile(subFontFileStr, subFont, 0600)
+		err = os.WriteFile(subFontFileStr, subFont, 0o600)
 		if err == nil {
 			y := 24.0
 			pdf := gofpdf.New("P", "mm", "A4", "")

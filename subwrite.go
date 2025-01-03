@@ -24,7 +24,7 @@ func (f *Fpdf) SubWrite(ht float64, str string, subFontSize, subOffset float64, 
 	subX := f.x
 	subY := f.y
 	f.SetXY(subX, subY-subOffset)
-	//Output text
+	// Output text
 	f.write(ht, str, link, linkStr)
 	// restore y position
 	subX = f.x

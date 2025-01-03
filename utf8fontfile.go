@@ -25,11 +25,13 @@ import (
 )
 
 // flags
-const symbolWords = 1 << 0
-const symbolScale = 1 << 3
-const symbolContinue = 1 << 5
-const symbolAllScale = 1 << 6
-const symbol2x2 = 1 << 7
+const (
+	symbolWords    = 1 << 0
+	symbolScale    = 1 << 3
+	symbolContinue = 1 << 5
+	symbolAllScale = 1 << 6
+	symbol2x2      = 1 << 7
+)
 
 // CID map Init
 const toUnicode = "/CIDInit /ProcSet findresource begin\n12 dict begin\nbegincmap\n/CIDSystemInfo\n<</Registry (Adobe)\n/Ordering (UCS)\n/Supplement 0\n>> def\n/CMapName /Adobe-Identity-UCS def\n/CMapType 2 def\n1 begincodespacerange\n<0000> <FFFF>\nendcodespacerange\n1 beginbfrange\n<0000> <FFFF> <0000>\nendbfrange\nendcmap\nCMapName currentdict /CMap defineresource pop\nend\nend"
@@ -117,7 +119,6 @@ func (utf *utf8FontFile) parseFile() error {
 }
 
 func (utf *utf8FontFile) generateTableDescriptions() {
-
 	tablesCount := utf.readUint16()
 	_ = utf.readUint16()
 	_ = utf.readUint16()
@@ -189,7 +190,7 @@ func (utf *utf8FontFile) skip(delta int) {
 	_, _ = utf.fileReader.seek(int64(delta), 1)
 }
 
-//SeekTable position
+// SeekTable position
 func (utf *utf8FontFile) SeekTable(name string) int {
 	return utf.seekTable(name, 0)
 }
@@ -342,7 +343,12 @@ func (utf *utf8FontFile) parseHEADTable() {
 	yMin := utf.readInt16()
 	xMax := utf.readInt16()
 	yMax := utf.readInt16()
-	utf.Bbox = fontBoxType{int(float64(xMin) * scale), int(float64(yMin) * scale), int(float64(xMax) * scale), int(float64(yMax) * scale)}
+	utf.Bbox = fontBoxType{
+		int(float64(xMin) * scale),
+		int(float64(yMin) * scale),
+		int(float64(xMax) * scale),
+		int(float64(yMax) * scale),
+	}
 	utf.skip(3 * 2)
 	_ = utf.readUint16()
 	symbolDataFormat := utf.readUint16()
@@ -561,7 +567,13 @@ func (utf *utf8FontFile) parseSymbols(usedRunes map[int]int) (map[int]int, map[i
 
 	symbolCollectionKeys = keySortInt(symbolCollection)
 	for _, oldSymbolIndex := range symbolCollectionKeys {
-		_, symbolArray, symbolCollection, symbolCollectionKeys = utf.getSymbols(oldSymbolIndex, &begin, symbolArray, symbolCollection, symbolCollectionKeys)
+		_, symbolArray, symbolCollection, symbolCollectionKeys = utf.getSymbols(
+			oldSymbolIndex,
+			&begin,
+			symbolArray,
+			symbolCollection,
+			symbolCollectionKeys,
+		)
 	}
 
 	return runeSymbolPairCollection, symbolArray, symbolCollection, symbolCollectionKeys
@@ -619,7 +631,6 @@ func (utf *utf8FontFile) generateCMAPTable(cidSymbolPairCollection map[int]int, 
 	cmap = append(cmap, 1)
 	for range cidArray {
 		cmap = append(cmap, 0)
-
 	}
 	cmap = append(cmap, 0)
 	for _, start := range cidArrayKeys {
@@ -635,7 +646,7 @@ func (utf *utf8FontFile) generateCMAPTable(cidSymbolPairCollection map[int]int, 
 	return cmapstr
 }
 
-//GenerateCutFont fill utf8FontFile from .utf file, only with runes from usedRunes
+// GenerateCutFont fill utf8FontFile from .utf file, only with runes from usedRunes
 func (utf *utf8FontFile) GenerateCutFont(usedRunes map[int]int) []byte {
 	utf.fileReader.readerPosition = 0
 	utf.symbolPosition = make([]int, 0)
@@ -682,7 +693,9 @@ func (utf *utf8FontFile) GenerateCutFont(usedRunes map[int]int) []byte {
 	utf.setOutTable("gasp", utf.getTableData("gasp"))
 
 	postTable := utf.getTableData("post")
-	postTable = append(append([]byte{0x00, 0x03, 0x00, 0x00}, postTable[4:16]...), []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}...)
+	postTable = append(
+		append([]byte{0x00, 0x03, 0x00, 0x00}, postTable[4:16]...),
+		[]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}...)
 	utf.setOutTable("post", postTable)
 
 	delete(cidSymbolPairCollection, 0)
@@ -726,7 +739,10 @@ func (utf *utf8FontFile) GenerateCutFont(usedRunes map[int]int) []byte {
 				if _, OK := utf.symbolData[originalSymbolIdx]["compSymbols"]; !OK {
 					utf.symbolData[originalSymbolIdx]["compSymbols"] = make([]int, 0)
 				}
-				utf.symbolData[originalSymbolIdx]["compSymbols"] = append(utf.symbolData[originalSymbolIdx]["compSymbols"], symbolIdx)
+				utf.symbolData[originalSymbolIdx]["compSymbols"] = append(
+					utf.symbolData[originalSymbolIdx]["compSymbols"],
+					symbolIdx,
+				)
 				data = utf.insertUint16(data, posInSymbol+2, symbolArray[symbolIdx])
 				posInSymbol += 4
 				if (flags & symbolWords) != 0 {
@@ -790,7 +806,13 @@ func (utf *utf8FontFile) GenerateCutFont(usedRunes map[int]int) []byte {
 	return utf.assembleTables()
 }
 
-func (utf *utf8FontFile) getSymbols(originalSymbolIdx int, start *int, symbolSet map[int]int, SymbolsCollection map[int]int, SymbolsCollectionKeys []int) (*int, map[int]int, map[int]int, []int) {
+func (utf *utf8FontFile) getSymbols(
+	originalSymbolIdx int,
+	start *int,
+	symbolSet map[int]int,
+	SymbolsCollection map[int]int,
+	SymbolsCollectionKeys []int,
+) (*int, map[int]int, map[int]int, []int) {
 	symbolPos := utf.symbolPosition[originalSymbolIdx]
 	symbolSize := utf.symbolPosition[originalSymbolIdx+1] - symbolPos
 	if symbolSize == 0 {
@@ -812,7 +834,13 @@ func (utf *utf8FontFile) getSymbols(originalSymbolIdx int, start *int, symbolSet
 				SymbolsCollectionKeys = append(SymbolsCollectionKeys, symbolIndex)
 			}
 			oldPosition, _ := utf.fileReader.seek(0, 1)
-			_, _, _, SymbolsCollectionKeys = utf.getSymbols(symbolIndex, start, symbolSet, SymbolsCollection, SymbolsCollectionKeys)
+			_, _, _, SymbolsCollectionKeys = utf.getSymbols(
+				symbolIndex,
+				start,
+				symbolSet,
+				SymbolsCollection,
+				SymbolsCollectionKeys,
+			)
 			utf.seek(int(oldPosition))
 			if flags&symbolWords != 0 {
 				utf.skip(4)
@@ -921,7 +949,11 @@ func (utf *utf8FontFile) parseLOCATable(format, numSymbols int) {
 	}
 }
 
-func (utf *utf8FontFile) generateSCCSDictionaries(runeCmapPosition int, symbolCharDictionary map[int][]int, charSymbolDictionary map[int]int) {
+func (utf *utf8FontFile) generateSCCSDictionaries(
+	runeCmapPosition int,
+	symbolCharDictionary map[int][]int,
+	charSymbolDictionary map[int]int,
+) {
 	maxRune := 0
 	utf.seek(runeCmapPosition + 2)
 	size := utf.readUint16()
